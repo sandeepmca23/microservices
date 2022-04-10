@@ -1,0 +1,215 @@
+{
+  "catalogs": [
+    {
+      "role": "admin",
+      "catalog": "(mysql|system)",
+      "allow": "all"
+    },
+    {
+      "group": "finance|human_resources",
+      "catalog": "postgres",
+      "allow": true
+    },
+    {
+      "catalog": "hive",
+      "allow": "all"
+    },
+    {
+      "user": "alice",
+      "catalog": "postgresql",
+      "allow": "read-only"
+    },
+    {
+      "catalog": "system",
+      "allow": "none"
+    }
+  ],
+  "schemas": [
+    {
+      "role": "admin",
+      "schema": ".*",
+      "owner": true
+    },
+    {
+      "user": "guest",
+      "owner": false
+    },
+    {
+      "catalog": "default",
+      "schema": "default",
+      "owner": true
+    }
+  ],
+  "tables": [
+    {
+      "role": "admin",
+      "privileges": [
+        "SELECT",
+        "INSERT",
+        "DELETE",
+        "UPDATE",
+        "OWNERSHIP"
+      ]
+    },
+    {
+      "user": "banned_user",
+      "privileges": [
+        
+      ]
+    },
+    {
+      "catalog": "default",
+      "schema": "hr",
+      "table": "employee",
+      "privileges": [
+        "SELECT"
+      ],
+      "filter": "user = current_user",
+      "filter_environment": {
+        "user": "system_user"
+      }
+    },
+    {
+      "catalog": "default",
+      "schema": "default",
+      "table": ".*",
+      "privileges": [
+        "SELECT"
+      ],
+      "columns": [
+        {
+          "name": "address",
+          "allow": false
+        },
+        {
+          "name": "SSN",
+          "mask": "'XXX-XX-' + substring(credit_card, -4)",
+          "mask_environment": {
+            "user": "system_user"
+          }
+        }
+      ]
+    }
+  ],
+  "system_session_properties": [
+    {
+      "role": "admin",
+      "allow": true
+    },
+    {
+      "user": "banned_user",
+      "allow": false
+    },
+    {
+      "property": "resource_overcommit",
+      "allow": true
+    }
+  ],
+  "catalog_session_properties": [
+    {
+      "role": "admin",
+      "allow": true
+    },
+    {
+      "user": "banned_user",
+      "allow": false
+    },
+    {
+      "catalog": "hive",
+      "property": "bucket_execution_enabled",
+      "allow": true
+    }
+  ],
+  "queries": [
+    {
+      "role": "admin",
+      "allow": [
+        "execute",
+        "kill",
+        "view"
+      ]
+    },
+    {
+      "user": "alice",
+      "allow": [
+        "execute",
+        "kill"
+      ]
+    },
+    {
+      "group": "contractors",
+      "queryOwner": "alice|dave",
+      "allow": [
+        "view"
+      ]
+    },
+    {
+      "allow": [
+        "execute"
+      ]
+    }
+  ],
+  "impersonation": [
+    {
+      "original_role": "admin",
+      "new_user": "bob",
+      "allow": false
+    },
+    {
+      "original_role": "admin",
+      "new_user": ".*"
+    },
+    {
+      "original_user": ".*",
+      "new_user": "test"
+    }
+  ],
+  "principals": [
+    {
+      "principal": "(.*)",
+      "principal_to_user": "$1",
+      "allow": true
+    },
+    {
+      "principal": "([^/]+)(/.*)?@.*",
+      "principal_to_user": "$1",
+      "allow": true
+    },
+    {
+      "principal": "([^/]+)/?.*@example.net",
+      "principal_to_user": "$1",
+      "allow": true
+    },
+    {
+      "principal": "group@example.net",
+      "user": "alice|bob",
+      "allow": true
+    }
+  ],
+  "system_information": [
+    {
+      "role": "admin",
+      "allow": [
+        "read",
+        "write"
+      ]
+    },
+    {
+      "user": "alice",
+      "allow": [
+        "read"
+      ]
+    }
+  ],
+  "session_properties": [
+    {
+      "property": "force_local_scheduling",
+      "allow": true
+    },
+    {
+      "user": "admin",
+      "property": "max_split_size",
+      "allow": true
+    }
+  ]
+}
